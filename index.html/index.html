@@ -1,0 +1,195 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Madden MM Menu Demo</title>
+<style>
+body {
+  background: #101810;
+    color: white;
+      font-family: Arial, sans-serif;
+        text-align: center;
+          padding: 30px 10px;
+          }
+          #mm {
+            position: fixed;
+              top: 40%;
+                left: 15px;
+                  width: 60px;
+                    height: 60px;
+                      border-radius: 50%;
+                        border: 2px solid white;
+                          background: #20d65c;
+                            color: black;
+                              font-weight: bold;
+                                font-size: 20px;
+                                  z-index: 10;
+                                    touch-action: none;
+                                    }
+                                    #menu {
+                                      display: none;
+                                        position: fixed;
+                                          top: 20%;
+                                            left: 85px;
+                                              width: 230px;
+                                                background: #17251b;
+                                                  border: 2px solid #20d65c;
+                                                    border-radius: 15px;
+                                                      padding: 15px;
+                                                        z-index: 9;
+                                                          text-align: left;
+                                                          }
+                                                          #menu.open { display: block; }
+                                                          h3 { color: #20d65c; }
+                                                          input[type=range] {
+                                                            width: 100%;
+                                                              accent-color: #20d65c;
+                                                              }
+                                                              button.action {
+                                                                background: #20d65c;
+                                                                  color: black;
+                                                                    border: none;
+                                                                      padding: 9px;
+                                                                        border-radius: 7px;
+                                                                          font-weight: bold;
+                                                                            margin: 4px;
+                                                                            }
+                                                                            .row { margin: 15px 0; }
+                                                                            </style>
+                                                                            </head>
+                                                                            <body>
+
+                                                                            <h2>MADDEN FLOATING MENU</h2>
+                                                                            <p>Drag or tap the green MM button.</p>
+                                                                            <p>Standalone demo only.</p>
+
+                                                                            <button id="mm">MM</button>
+
+                                                                            <div id="menu">
+                                                                              <h3>MM CONTROL PANEL</h3>
+
+                                                                                <p>Speed: <output id="speedVal">50</output></p>
+                                                                                  <input id="speed" type="range" min="0" max="99" value="50">
+
+                                                                                    <p>Strength: <output id="strengthVal">50</output></p>
+                                                                                      <input id="strength" type="range" min="0" max="99" value="50">
+
+                                                                                        <p>Accuracy: <output id="accuracyVal">50</output></p>
+                                                                                          <input id="accuracy" type="range" min="0" max="99" value="50">
+
+                                                                                            <div class="row">
+                                                                                                <label>
+                                                                                                      <input id="unlock" type="checkbox">
+                                                                                                            Unlock All Players (demo)
+                                                                                                                </label>
+                                                                                                                  </div>
+
+                                                                                                                    <p id="status"></p>
+
+                                                                                                                      <button class="action" id="reset">RESET</button>
+                                                                                                                        <button class="action" id="close">CLOSE</button>
+                                                                                                                        </div>
+
+                                                                                                                        <script>
+                                                                                                                        const mm = document.getElementById("mm");
+                                                                                                                        const menu = document.getElementById("menu");
+
+                                                                                                                        function positionMenu() {
+                                                                                                                          const r = mm.getBoundingClientRect();
+                                                                                                                            const w = menu.offsetWidth;
+                                                                                                                              const h = menu.offsetHeight;
+
+                                                                                                                                let x = r.right + 10;
+                                                                                                                                  if (x + w > innerWidth) {
+                                                                                                                                      x = Math.max(5, r.left - w - 10);
+                                                                                                                                        }
+
+                                                                                                                                          let y = Math.max(5, Math.min(r.top - 50, innerHeight - h - 5));
+
+                                                                                                                                            menu.style.left = x + "px";
+                                                                                                                                              menu.style.top = y + "px";
+                                                                                                                                              }
+
+                                                                                                                                              let dragging = false;
+                                                                                                                                              let moved = false;
+                                                                                                                                              let startX, startY, originalX, originalY;
+
+                                                                                                                                              mm.addEventListener("pointerdown", e => {
+                                                                                                                                                dragging = true;
+                                                                                                                                                  moved = false;
+                                                                                                                                                    startX = e.clientX;
+                                                                                                                                                      startY = e.clientY;
+
+                                                                                                                                                        const r = mm.getBoundingClientRect();
+                                                                                                                                                          originalX = r.left;
+                                                                                                                                                            originalY = r.top;
+
+                                                                                                                                                              mm.setPointerCapture(e.pointerId);
+                                                                                                                                                              });
+
+                                                                                                                                                              mm.addEventListener("pointermove", e => {
+                                                                                                                                                                if (!dragging) return;
+
+                                                                                                                                                                  const dx = e.clientX - startX;
+                                                                                                                                                                    const dy = e.clientY - startY;
+
+                                                                                                                                                                      if (Math.abs(dx) + Math.abs(dy) > 7) moved = true;
+
+                                                                                                                                                                        if (moved) {
+                                                                                                                                                                            mm.style.left = Math.max(4, Math.min(innerWidth-64, originalX+dx)) + "px";
+                                                                                                                                                                                mm.style.top = Math.max(4, Math.min(innerHeight-64, originalY+dy)) + "px";
+
+                                                                                                                                                                                    if (menu.classList.contains("open")) positionMenu();
+                                                                                                                                                                                      }
+                                                                                                                                                                                      });
+
+                                                                                                                                                                                      mm.addEventListener("pointerup", () => {
+                                                                                                                                                                                        dragging = false;
+                                                                                                                                                                                        });
+
+                                                                                                                                                                                        mm.addEventListener("click", () => {
+                                                                                                                                                                                          if (moved) {
+                                                                                                                                                                                              moved = false;
+                                                                                                                                                                                                  return;
+                                                                                                                                                                                                    }
+
+                                                                                                                                                                                                      menu.classList.toggle("open");
+
+                                                                                                                                                                                                        if (menu.classList.contains("open")) {
+                                                                                                                                                                                                            positionMenu();
+                                                                                                                                                                                                              }
+                                                                                                                                                                                                              });
+
+                                                                                                                                                                                                              ["speed","strength","accuracy"].forEach(id => {
+                                                                                                                                                                                                                const slider = document.getElementById(id);
+                                                                                                                                                                                                                  const output = document.getElementById(id + "Val");
+
+                                                                                                                                                                                                                    slider.addEventListener("input", () => {
+                                                                                                                                                                                                                        output.value = slider.value;
+                                                                                                                                                                                                                          });
+                                                                                                                                                                                                                          });
+
+                                                                                                                                                                                                                          document.getElementById("unlock").addEventListener("change", e => {
+                                                                                                                                                                                                                            document.getElementById("status").textContent =
+                                                                                                                                                                                                                                e.target.checked ? "Demo switch ON" : "Demo switch OFF";
+                                                                                                                                                                                                                                });
+
+                                                                                                                                                                                                                                document.getElementById("reset").onclick = () => {
+                                                                                                                                                                                                                                  ["speed","strength","accuracy"].forEach(id => {
+                                                                                                                                                                                                                                      document.getElementById(id).value = 50;
+                                                                                                                                                                                                                                          document.getElementById(id+"Val").value = 50;
+                                                                                                                                                                                                                                            });
+
+                                                                                                                                                                                                                                              document.getElementById("unlock").checked = false;
+                                                                                                                                                                                                                                                document.getElementById("status").textContent = "Reset complete!";
+                                                                                                                                                                                                                                                };
+
+                                                                                                                                                                                                                                                document.getElementById("close").onclick = () => {
+                                                                                                                                                                                                                                                  menu.classList.remove("open");
+                                                                                                                                                                                                                                                  };
+                                                                                                                                                                                                                                                  </script>
+                                                                                                                                                                                                                                                  </body>
+                                                                                                                                                                                                                                                  </html>
+                                                                                                                                                                                                                                                
